@@ -13,6 +13,19 @@ This will install the meteor npm modules.
 4. Final step is in the command prompt or terminal type meteor.
 5. This will start the server at http://localhost:3000/
 6. Hit the url and you can see the app running.
+7. First time you load the application you will not see any data as the mongodb is empty. 
+8. Use postman or something else and hit the url 
+localhost:3000/api/cc/device/:id
+replace id with (1 or 2 or 3 or whatever)
+9. Send data as json body of postman x-www-form-urlencoded with data being
+10. temperature : 40 (say) and humidity : 33 (say)
+11. If you get a message on postman like 
+{
+    "message": "recorded"
+}
+The message is saved to mongodb.
+12. You can see this device in your web application frontend now.
+13. Double click on the device id and you can see the corresponding data.
 
 
 # How the application works
