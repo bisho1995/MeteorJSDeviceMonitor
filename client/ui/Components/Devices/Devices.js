@@ -10,18 +10,21 @@ class Devices extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            devices: []
+            devices: [],
+            activeId: null
         }
     }
 
     componentDidMount() {
         Tracker.autorun(() => {
-            this.setState({devices: Id.find({}, {sort: {id: 1}}).fetch().map(device => device.id)})
+            const devices = Id.find({}, {sort: {id: 1}}).fetch().map(device => device.id)
+            this.setState({devices, activeId: devices[0]})
         })
     }
 
     setId(e) {
         this.props.setId(e.target.getAttribute('data-id'))
+        this.setState({activeId: e.target.getAttribute('data-id')})
     }
 
     render() {
@@ -30,7 +33,16 @@ class Devices extends Component {
                 <h1>Device Ids</h1>
                 <table className="table table-striped table-bordered table-hover"><tbody>
                     {
-                        this.state.devices.map((device, i) => <tr key={i}><td data-id={device} onClick={this.setId.bind(this)}>{device}</td></tr>)
+                        this.state.devices.map((device, i) => 
+                        <tr key={i}>
+                            <td 
+                            data-id={device} 
+                            onClick={this.setId.bind(this)}
+                            className={(this.state.activeId == device ? 'active' : '')}
+                            >
+                                {device}
+                            </td>
+                        </tr>)
                     }
                 </tbody></table>
             </div>

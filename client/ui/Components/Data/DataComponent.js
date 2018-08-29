@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {Tracker} from 'meteor/tracker';
+import { Tracker } from 'meteor/tracker';
 import { connect } from 'react-redux';
-import {Data, Id} from '../../../../imports/collections/data'
+import { Data, Id } from '../../../../imports/collections/data'
 import store from '../../store/index'
 
 class DataComponent extends Component {
@@ -9,24 +9,48 @@ class DataComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: [],
-            id: 1
+            device: "1",
+            data: []
         }
-        console.log(this.props.devices)
     }
 
     getDataFromMongo() {
         Tracker.autorun(() => {
-            this.setState({data: Data.find({id: this.props.devices}, {sort: {createdAt: -1}, limit: 10}).fetch().map(data => data.data)})
+            const data = Data
+                .find({
+                    id: this.state.device
+                }, 
+                {
+                    sort: {
+                        createdAt: -1
+                    }, 
+                    limit: 10
+                })
+                .fetch()
+                .map(data => data.data)
+            this.setState({data})
+        })
+    }
+
+    initialDeviceData() {
+        Tracker.autorun(() => {
+            this.setState({device: Id.find({}, {sort: {id: 1}, limit: 1}).fetch().map(device => device.id)[0]}, () => {
+                this.getDataFromMongo()
+            })
+        })
+    }
+
+    updatedDeviceData() {
+        store.subscribe(() => {
+            this.setState({device: store.getState().devices}, () => {
+                this.getDataFromMongo()
+            })
         })
     }
 
     componentDidMount() {
-        this.getDataFromMongo()
-        store.subscribe(() => {
-            this.setState({id: store.getState().devices})
-            this.getDataFromMongo()
-        })
+        this.initialDeviceData()
+        this.updatedDeviceData()
     }
 
     render() {
@@ -46,8 +70,11 @@ class DataComponent extends Component {
     }
 }
 
-function mapStateToProps(state ) {
-    return state
+
+let mapStateToProps = (state) => {
+    return {
+        device: state.devices
+    }
 }
 
-export default connect(mapStateToProps, null)(DataComponent);
+export default connect(mapStateToProps)(DataComponent);
