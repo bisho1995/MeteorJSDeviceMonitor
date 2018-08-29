@@ -12,11 +12,12 @@ class DataComponent extends Component {
             data: [],
             id: 1
         }
+        console.log(this.props.devices)
     }
 
     getDataFromMongo() {
         Tracker.autorun(() => {
-            this.setState({data: Data.find({id: this.state.id}, {sort: {createdAt: -1}, limit: 10}).fetch().map(data => data.data)})
+            this.setState({data: Data.find({id: this.props.devices}, {sort: {createdAt: -1}, limit: 10}).fetch().map(data => data.data)})
         })
     }
 
@@ -24,7 +25,6 @@ class DataComponent extends Component {
         this.getDataFromMongo()
         store.subscribe(() => {
             this.setState({id: store.getState().devices})
-            console.log(this.state.id)
             this.getDataFromMongo()
         })
     }
